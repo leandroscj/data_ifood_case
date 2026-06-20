@@ -13,9 +13,9 @@ def apply_metadata_table(schema_destino, df):
     df = df.select(*colunas_formatadas)
     return df
 
-def write_bucket(df, target_table, competencia):
+def write_bucket(df, target_table):
     df.write \
         .format("delta") \
         .mode("overwrite") \
-        .option("replaceWhere", f"competencia = {competencia}") \
+        .option("partitionOverwriteMode", "dynamic") \
         .saveAsTable(target_table)
