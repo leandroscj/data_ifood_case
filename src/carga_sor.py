@@ -6,7 +6,7 @@ def exec_carga_sor(competencia, path_entrada, table, schema_destino):
     df = df.withColumn("competencia", lit(competencia))
     df = apply_metadata_table(schema_destino, df)
 
-    write_bucket(df, table)
+    write_bucket(df, table, competencia)
 
 if __name__ == "__main__":
     BUCKET = "ifood-case-406207085720"
