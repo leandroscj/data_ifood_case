@@ -1,8 +1,6 @@
 from pyspark.sql.functions import lit, col
 
-def get_metadata_table(target_table, df):
-    schema_destino = spark.table(target_table).limit(0).schema
-
+def apply_metadata_table(schema_destino, df):
     colunas_formatadas = []
     for campo in schema_destino:
         nome_coluna = campo.name
@@ -11,6 +9,9 @@ def get_metadata_table(target_table, df):
             colunas_formatadas.append(col(nome_coluna).cast(tipo_coluna))  
         else:
             colunas_formatadas.append(lit(None).cast(tipo_coluna).alias(nome_coluna))
+    
+    df = df.select(*colunas_formatadas)
+    return df
 
 def write_bucket(df, target_table):
     df.write \
