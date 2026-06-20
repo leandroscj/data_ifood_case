@@ -24,7 +24,7 @@ if __name__ == "__main__":
         "green": ["202301", "202302","202303", "202304", "202305"]
     }
     TABLE = "sot.ny_taxi"
-    TABLE_YELLOW = "sot.yellow_taxi"
-    TABLE_GREEN = "sot.green_taxi"
+    TABLE_YELLOW = "sor.yellow_taxi"
+    TABLE_GREEN = "sor.green_taxi"
 
     exec_carga_sot(TABLE, TABLE_YELLOW, TABLE_GREEN)
