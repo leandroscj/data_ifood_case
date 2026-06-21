@@ -1,3 +1,5 @@
+import os
+import json
 from pyspark.sql.functions import lit, col
 from utils.functions import apply_metadata_table, write_bucket
 
@@ -9,11 +11,12 @@ def exec_carga_sor(competencia, path_entrada, table, schema_destino):
     write_bucket(df, table)
 
 if __name__ == "__main__":
-    BUCKET = "ifood-case-406207085720"
-    VEHICLE_COMPETENCIAS = {
-        "yellow": ["202301", "202302","202303", "202304", "202305"],
-        "green": ["202301", "202302","202303", "202304", "202305"]
-    }
+    path_param = os.path.join(os.path.dirname(os.path.abspath(__file__)), "param.json")
+    with open(path_param, "r") as f:
+        params = json.load(f)
+
+    BUCKET = params["BUCKET"]
+    VEHICLE_COMPETENCIAS = params["VEHICLE_COMPETENCIAS"]
     
     for vehicle, competencias in VEHICLE_COMPETENCIAS.items():
         table = f"sor.{vehicle}_taxi"

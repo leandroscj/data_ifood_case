@@ -1,3 +1,5 @@
+import os
+import json
 from pyspark.sql.functions import lit, col, sum as spark_sum
 from utils.functions import apply_metadata_table, write_bucket
 
@@ -25,11 +27,10 @@ def exec_carga_spec(spec_table, table_sot):
     write_bucket(union_df, spec_table)
 
 if __name__ == "__main__":
-    VEHICLE_COMPETENCIAS = {
-        "yellow": ["202301", "202302","202303", "202304", "202305"],
-        "green": ["202301", "202302","202303", "202304", "202305"]
-    }
-    TABLE = "spec.ny_taxi_consumers"
-    TABLE_SOT = "sot.ny_taxi"
+    path_param = os.path.join(os.path.dirname(os.path.abspath(__file__)), "param.json")
+    with open(path_param, "r") as f:
+        params = json.load(f)
 
-    exec_carga_spec(TABLE, TABLE_SOT)
+    VEHICLE_COMPETENCIAS = params["VEHICLE_COMPETENCIAS"]
+    tables = params["carga_spec"]
+    exec_carga_spec(tables["TABLE_SPEC"], tables["TABLE_SOT"])
