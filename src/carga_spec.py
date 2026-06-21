@@ -1,4 +1,3 @@
-import os
 import json
 from pyspark.sql.functions import lit, col, sum as spark_sum
 from utils.functions import apply_metadata_table, write_bucket
@@ -27,7 +26,7 @@ def exec_carga_spec(spec_table, table_sot):
     write_bucket(union_df, spec_table)
 
 if __name__ == "__main__":
-    path_param = os.path.join(os.path.dirname(os.path.abspath(__file__)), "param.json")
+    path_param = "param.json"
     with open(path_param, "r") as f:
         params = json.load(f)
 
