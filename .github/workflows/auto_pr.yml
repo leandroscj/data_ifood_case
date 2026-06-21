@@ -1,0 +1,52 @@
+name: Auto Pull Request Creator
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'feature-*'
+      - 'develop'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine target branch
+        id: target
+        run: |
+          BRANCH_NAME="${GITHUB_REF#refs/heads/}"
+          echo "Source branch: $BRANCH_NAME"
+          if [[ "$BRANCH_NAME" == feature/* || "$BRANCH_NAME" == feature-* ]]; then
+            echo "target_branch=develop" >> $GITHUB_OUTPUT
+            echo "title=Auto PR: Feature para Develop" >> $GITHUB_OUTPUT
+          elif [[ "$BRANCH_NAME" == "develop" ]]; then
+            echo "target_branch=main" >> $GITHUB_OUTPUT
+            echo "title=Auto PR: Develop para Main" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SRC_BRANCH: ${{ github.ref_name }}
+          DST_BRANCH: ${{ steps.target.outputs.target_branch }}
+          PR_TITLE: ${{ steps.target.outputs.title }}
+        run: |
+          # Verifica se já existe um PR aberto entre essas branches
+          PR_EXISTS=$(gh pr list --head "$SRC_BRANCH" --base "$DST_BRANCH" --state open --json number --jq 'length')
+          if [ "$PR_EXISTS" -eq "0" ]; then
+            echo "Criando pull request de $SRC_BRANCH para $DST_BRANCH..."
+            gh pr create \
+              --title "$PR_TITLE" \
+              --body "Este Pull Request foi criado automaticamente pelo GitHub Actions." \
+              --head "$SRC_BRANCH" \
+              --base "$DST_BRANCH"
+          else
+            echo "Já existe um Pull Request aberto de $SRC_BRANCH para $DST_BRANCH."
+          fi
